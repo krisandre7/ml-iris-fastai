@@ -1,0 +1,59 @@
+# Important info
+dataset_name: 'casia'
+model_name: 'siameseNet'
+backbone: 'none'
+
+output_path: './reports'
+random_seed: 42
+
+# StratifiedShuffleSplit
+train_size: 0.667
+test_size: 0.333
+# train_size: 0.334
+# test_size: 0.666
+
+# Datasets
+final_shape: [1, 280, 320]
+csv_dir: './'
+dataset_dir: './'
+train_dataset:
+  augment: True
+  grayscale: True
+  shuffle: False
+test_dataset:
+  augment: False
+  grayscale: True
+  shuffle: False
+
+
+# Dataloader
+train_dataloader:
+  batch_size: 64
+  shuffle: True
+test_dataloader:
+  batch_size: 64
+  shuffle: False
+
+# LR Scheduler
+lr_scheduler:
+  step_size: 8
+  gamma: 0.1
+  last_epoch: -1
+
+# Training Fit
+fit:
+  n_epochs: 500
+  log_interval: 2
+  save_best: True
+  save_after: 5
+  metrics: ['triplet-accuracy']
+  accuracy_margin: 0.5
+
+# Model
+output_num: 3
+
+# loss
+loss_margin: 0.5
+
+# Training
+learning_rate: 0.001
