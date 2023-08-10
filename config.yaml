@@ -1,6 +1,7 @@
 # Important info
 dataset_name: 'casia'
 model_name: 'siameseNet'
+arch: 'efficientnet_b1_pruned'
 
 output_path: './reports'
 random_seed: 42
@@ -21,6 +22,7 @@ wandb:
   log: 'all'
   log_preds: False
   dataset_name: 'casia'
+  log_model: True
 save_model:
   monitor: 'valid_loss'
   min_delta: 0.0

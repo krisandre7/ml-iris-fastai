@@ -47,7 +47,7 @@ def getDataframe(dataset_dir: str, dataset_name: str, csv_dir: str, train_size: 
     
     return dataframe
 
-def stratifiedSortedSplit(file_paths: np.array, labels: np.array, 
+def stratifiedSortedSplit(file_paths, labels, 
                     train_size: float, test_size: float, random_seed: int):
     """Splits image paths and labels equally for each class, then sorts them"""
     splitter = StratifiedShuffleSplit(n_splits=1, 
