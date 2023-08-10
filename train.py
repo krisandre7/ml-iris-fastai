@@ -17,9 +17,6 @@ if torch.cuda.is_available():
     torch.backends.cudnn.deterministic = True  #needed
     torch.backends.cudnn.benchmark = False
 
-git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
-
 training_id =  datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 final_path = os.path.join(config.output_path, training_id)
 
