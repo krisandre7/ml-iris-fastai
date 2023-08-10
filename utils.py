@@ -23,29 +23,29 @@ def get_label(path: str, dataset_name: str):
     label = int(dataset_split.split('/',2)[1])
     return label - 1
 
-def getDataset(dataset_dir: str, dataset_name: str, csv_dir: str, train_size: float, test_size: float, random_seed: int, **kwargs):
-    train_path = os.path.join(csv_dir, 'train.csv')
-    test_path = os.path.join(csv_dir, 'test.csv')
-    if os.path.isfile(train_path) and os.path.isfile(test_path):
-        return pd.read_csv(train_path), pd.read_csv(test_path)
+def getDataframe(dataset_dir: str, dataset_name: str, csv_dir: str, train_size: float, test_size: float, random_seed: int, **kwargs):
+    csv_name = 'train_test.csv'
+    
+    dataset = os.path.join(csv_dir, csv_name)
+    if os.path.isfile(dataset):
+        return pd.read_csv(dataset, index_col=0)
 
     file_paths = np.array(glob.glob(dataset_dir + dataset_name + '/*/*.bmp'))
     labels = np.array([get_label(path, dataset_name) for path in file_paths])
     files_train, labels_train, files_test, labels_test = stratifiedSortedSplit(file_paths, labels, train_size, test_size, random_seed)
     
-    train_dataset = pd.DataFrame({
-        "file_path": files_train,
-        "label": labels_train
-    })
-    test_dataset = pd.DataFrame({
-        "file_path": files_test,
-        "label": labels_test
+    files = np.concatenate([files_train, files_test])
+    labels = np.concatenate([labels_train, labels_test])
+    dataframe = pd.DataFrame({
+        "name": files,
+        "label": labels,
     })
     
-    train_dataset.to_csv(train_path)   
-    test_dataset.to_csv(test_path)   
+    dataframe["is_test"] = np.concatenate([np.full(len(files_train), False), np.full(len(files_test), True)])    
     
-    return train_dataset, test_dataset
+    dataframe.to_csv(csv_name)
+    
+    return dataframe
 
 def stratifiedSortedSplit(file_paths: np.array, labels: np.array, 
                     train_size: float, test_size: float, random_seed: int):
