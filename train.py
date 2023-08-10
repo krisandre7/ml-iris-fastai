@@ -8,10 +8,9 @@ import random
 import wandb
 import torch.backends.cudnn as cudnn
 import timm
+import timm.optim
 
 config = utils.openConfig()
-
-wandb.init(project="ml-iris", config=config)
 
 # The following settings guarantee reproducibility
 np.random.seed(config.random_seed) # cpu vars
@@ -24,14 +23,9 @@ if torch.cuda.is_available():
     cudnn.benchmark = False   
     
 
-# training_id =  datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-# final_path = os.path.join(config.output_path, training_id)
+training_id =  datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+final_path = os.path.join(config.output_path, training_id)
 
-# os.makedirs(final_path, exist_ok=True)
-
-# Write config to output folder
-# with open(os.path.join(final_path, 'config.yaml'), 'w') as file:
-#     yaml.dump(config, file)
 # print('-----------------------------')
 # print(f'Beginning training with id {training_id}!')
 
@@ -46,16 +40,36 @@ train_count = np.unique(dataloaders.train_ds.items['label'], return_counts=True)
 test_count = np.unique(dataloaders.valid_ds.items['label'], return_counts=True)[1].mean()
 print(f"Split {train_count} images for train and {test_count} for test")
 
+model = timm.create_model(**config.model)
 
-learn = vision_learner(dls=dataloaders, 
-                       arch=config.arch, 
-                       metrics=accuracy)
-
-learn.add_cbs([WandbCallback(**config.wandb), 
+opt_func = Adam
+loss_func = CrossEntropyLossFlat()
+callbacks = [WandbCallback(**config.wandb), 
                SaveModelCallback(**config.save_model), 
                ReduceLROnPlateau(**config.reduce_lr)
-               ])
+               ]
 
-learn.fine_tune(config.epochs)
+learn = vision_learner(dls=dataloaders, 
+                       arch='tf_efficientnet_b0', 
+                       metrics=accuracy,
+                       loss_func=loss_func,
+                       opt_func=opt_func,
+                       cbs=callbacks,
+                       path=final_path,
+                       model_dir='',
+                       lr=config.learning_rate
+                       )
+
+os.makedirs(final_path, exist_ok=True)
+
+# Write config to output folder
+with open(os.path.join(final_path, 'config.yaml'), 'w') as file:
+    yaml.dump(config, file)
+
+wandb.init(project="ml-iris", config=config, dir=final_path, 
+           sync_tensorboard=config.sync_tensorboard)
+
+
+learn.fine_tune(config.epochs, freeze_epochs=config.freeze_epochs)
 
 wandb.finish()

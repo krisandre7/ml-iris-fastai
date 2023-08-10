@@ -1,10 +1,17 @@
-# Important info
-dataset_name: 'casia'
-model_name: 'siameseNet'
-arch: 'efficientnet_b1_pruned'
+# Model
+model:
+  model_name: 'tf_efficientnet_b0'
+  pretrained: True 
+  scriptable: True
+  exportable: True
+  # Usado para resumir o treino a partir de um checkpoint
+  # Caso o treino seja do zero, deixe comentado
+  # checkpoint_path: None 
 
 output_path: './reports'
 random_seed: 42
+
+learning_rate: 0.001
 
 # StratifiedShuffleSplit
 train_size: 0.667
@@ -13,6 +20,7 @@ test_size: 0.333
 # Datasets
 final_shape: [1, 280, 320]
 csv_dir: './'
+dataset_name: 'casia'
 dataset_dir: './'
 shuffle_train: True
 batch_size: 64 # batch_size
@@ -34,4 +42,8 @@ reduce_lr:
   min_delta: 0.1
   patience: 5
 
+# Train
 epochs: 500
+freeze_epochs: 500
+start_epoch: 0
+sync_tensorboard: True

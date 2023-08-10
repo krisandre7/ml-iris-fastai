@@ -15,4 +15,5 @@ __pycache__/
 
 # Pytorch
 *.pt
+*.pth
 .vscode/settings.json

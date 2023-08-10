@@ -5,7 +5,6 @@ import pandas as pd
 import yaml
 from box import Box
 import numpy as np
-from fastai.vision.all import *
 import glob
 
 # Rapid prototyping requires flexible data structures, such as dictionaries. 
