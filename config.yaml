@@ -1,9 +1,11 @@
 # Model
-model:
-  model_name: 'tf_efficientnet_b0'
-  pretrained: True 
-  scriptable: True
-  exportable: True
+model_name: 'resnetv2_50x1_bit'
+resize: 224
+# model:
+#   model_name: 'tf_efficientnet_b0'
+#   pretrained: True 
+#   scriptable: True
+#   exportable: True
   # Usado para resumir o treino a partir de um checkpoint
   # Caso o treino seja do zero, deixe comentado
   # checkpoint_path: None 
@@ -11,7 +13,7 @@ model:
 output_path: './reports'
 random_seed: 42
 
-learning_rate: 0.001
+learning_rate: 0.01
 
 # StratifiedShuffleSplit
 train_size: 0.667
@@ -40,10 +42,10 @@ save_model:
 reduce_lr:
   monitor: 'valid_loss'
   min_delta: 0.1
-  patience: 5
+  patience: 10
 
 # Train
 epochs: 500
-freeze_epochs: 500
+freeze_epochs: 250
 start_epoch: 0
 sync_tensorboard: True

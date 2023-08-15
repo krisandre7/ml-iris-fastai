@@ -34,30 +34,30 @@ dataframe = utils.getDataframe(**config)
 
 dataloaders = ImageDataLoaders.from_df(dataframe, valid_pct=0, valid_col='is_test', seed=config.random_seed, 
                          bs=config.batch_size, shuffle_train=config.shuffle_train,
-                         device=device)
+                         device=device, item_tfms=Resize(config.resize))
 
 train_count = np.unique(dataloaders.train_ds.items['label'], return_counts=True)[1].mean()
 test_count = np.unique(dataloaders.valid_ds.items['label'], return_counts=True)[1].mean()
 print(f"Split {train_count} images for train and {test_count} for test")
 
-model = timm.create_model(**config.model)
+# model = timm.create_model(**config.model)
 
-opt_func = Adam
-loss_func = CrossEntropyLossFlat()
+# opt_func = Adam
+# loss_func = CrossEntropyLossFlat()
 callbacks = [WandbCallback(**config.wandb), 
                SaveModelCallback(**config.save_model), 
                ReduceLROnPlateau(**config.reduce_lr)
                ]
 
 learn = vision_learner(dls=dataloaders, 
-                       arch='tf_efficientnet_b0', 
+                       arch=config.model_name, 
                        metrics=accuracy,
-                       loss_func=loss_func,
-                       opt_func=opt_func,
+                    #    loss_func=loss_func,
+                    #    opt_func=opt_func,
                        cbs=callbacks,
                        path=final_path,
                        model_dir='',
-                       lr=config.learning_rate
+                    #    lr=config.learning_rate
                        )
 
 os.makedirs(final_path, exist_ok=True)
@@ -66,10 +66,10 @@ os.makedirs(final_path, exist_ok=True)
 with open(os.path.join(final_path, 'config.yaml'), 'w') as file:
     yaml.dump(config, file)
 
-wandb.init(project="ml-iris", config=config, dir=final_path, 
+wandb.init(project="ml-iris-vit", config=config, dir=final_path, 
            sync_tensorboard=config.sync_tensorboard)
 
 
-learn.fine_tune(config.epochs, freeze_epochs=config.freeze_epochs)
+learn.fine_tune(config.epochs, freeze_epochs=config.freeze_epochs, start_epoch=config.start_epoch)
 
 wandb.finish()
